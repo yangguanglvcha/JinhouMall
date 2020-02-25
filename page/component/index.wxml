@@ -1,0 +1,59 @@
+<view class="main">
+    <swiper indicator-dots="true" autoplay="true" interval="{{interval}}" duration="{{duration}}" circular="true" >
+        <block wx:for="{{imgUrls}}" wx:key="mark">
+            <swiper-item >
+                <image src="{{item.url}}" class="slide-image" width="100%" bindtap='onSelect' data-itemno='{{item.itemno}}' data-mark='{{item.mark}}'/>
+                <!--image src="{{item.url}}" class="slide-image" width="100%" bindtap='onSelect' data-itemno='{{item.itemno}}' data-mark='{{item.mark}}'/-->
+            </swiper-item>
+        </block>
+    </swiper>
+
+    <!--精选主题部分，去掉
+    <view class="selected">
+        <view class="select-title"><text>精选主题</text></view>
+        <view class="select-top">
+            <view class="select-top-small">
+                <navigator url="list/list">
+                    <image src="/image/s1.png"></image>
+                </navigator>
+            </view>
+            <view class="select-top-small">
+                <navigator url="list/list">
+                    <image src="/image/s2.png"></image>
+                </navigator>
+            </view>
+        </view>
+        <view class="select-bottom">
+            <navigator url="list/list">
+                <image src="/image/s3.png"></image>
+            </navigator>
+        </view>
+    </view>
+    以上为精选主题部分，去掉不用
+    -->
+    <!--九宫格导航部分-->
+    <view class='weui-grids'>
+      <block wx:for='{{indexmenu}}' wx:key='jgg'>
+      <navigator class='weui-grid' src='/page/component/{{item.url}}/{{item.url}}'>
+        <image class='weui-grid__icon' src='{{item.icon}}'/>
+        <view class='weui-grid__label'>{{item.text}}</view>
+      </navigator>
+      </block>
+    </view>
+
+    <!--2020.1.20改造成金猴产品   -->
+    <view class="newest">
+        <view class="newest-title"><text>最近新品</text></view>
+        <view class="newest-box">
+            <view class="newest-list" wx:for='{{goods}}' wx:key='idgood'>
+                <navigator url="details/details?itemno={{item.itemno}}&price={{item.price}}&itemname={{item.itemname}}&stock={{item.stock}}&thumb={{item.thumb}}&detail=''">
+                    <image src="https://jhsc.jinhou.online:886/{{item.picpath}}"></image>
+                    <!-- 可以从数据库中获取产品名称和价格，但这里取的是包含名称和价格的图片，所以暂时把名称和价格部分去掉
+                    <view class="newest-text"><text>{{item.itemname}}</text></view>
+                    <view class="newest-text"><text>￥{{item.price}}</text></view>
+                    -->
+                </navigator>
+            </view>            
+        </view>
+    </view>
+</view>

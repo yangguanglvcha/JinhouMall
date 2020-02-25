@@ -1,0 +1,10 @@
+{
+    "navigationBarTitleText": "地址管理",
+    "enablePullDownRefresh": false,  
+   
+      "usingComponents": {
+        "region": "plugin://myPlugin/region",
+        "special": "plugin://myPlugin/special"
+      }
+ 
+}

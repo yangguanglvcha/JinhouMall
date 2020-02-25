@@ -1,0 +1,15 @@
+<!--page/component/login/login.wxml-->
+<!--wxml:利用canIUse变量去兼容低版本-->
+    <view wx:if="{{!hasUserInfo && canIUse }}">
+      <view  class='start' style='text-align:center;margin-top:50rpx;margin-bottom:50rpx;'>
+      金猴微商城，助力抗击疫情。点击确认开启营销之旅~
+      </view>
+      
+      <view class="weui-btn">   <!--view class="zan-btns" start-->
+        <button open-type='getUserInfo' bindgetuserinfo="getUserInfo" class="weui-btn zan-btn--primary">确认</button>  
+      </view>     <!--view class="zan-btns"  end-->
+    </view>       <!--view wx:if="{{canIUse}}" end-->
+
+      <!--view wx:else class='zan-font-16 zan-c-red' style='text-align:center;margin-top:50rpx'>
+        微信版本太低，不能继续...
+      </view-->

@@ -1,0 +1,45 @@
+<view class="main">
+    <view class="form-box">
+        <form bindsubmit="formSubmit">
+
+        <view class="weui-cell weui-cell_input">
+            <view class='weui-cell__bd'>
+              <view class='weui-label'>姓名</view>
+            </view>
+            <view class='weui-cell__hd'>
+              <input class='weui-input' value="{{address.name}}" placeholder="请输入姓名" bindinput="bindName"/>
+            </view>
+        </view>    
+
+        <view class='weui-cell weui-cell_input'>  
+          <view class='weui-cell__bd'>
+            <view class='weui-label'>电话号码</view>
+          </view>
+          <view class='weui-cell__hd'>
+            <input type="number" value="{{address.phone}}" placeholder="电话号码" bindinput="bindPhone" />
+          </view>
+        </view>    
+            
+            <!-- value为初始数据，并不是双向绑定。bindrchange为数据变更后的回调,r-class为外部样式 -->            
+        <view class='weui-cell weui-cell_input'>
+          <view class='weui-cell__bd'>
+            <view class='weui-label'>地区</view>
+          </view>
+          <view class='weui-cell__hd picker-input'>
+             <region value="{{value}}" bindrchange="onRChange"/>
+          </view>
+        </view> 
+
+        <view class='weui-cell weui-cell_input'>
+          <view class='weui-cell__bd'>
+            <view class='weui-lable'>详细地址</view>
+          </view>
+          <view class='weui-cell__hd'>
+             <input value="{{address.detail}}" placeholder="请输入详细地址" bindinput="bindDetail"/>
+          </view>   
+        </view>    
+            
+            <button form-type="submit">保存</button>
+        </form>
+    </view>
+</view>
