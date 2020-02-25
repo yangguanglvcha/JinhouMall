@@ -1,15 +1,21 @@
 <!--page/component/login/login.wxml-->
-<!--wxml:利用canIUse变量去兼容低版本-->
-    <view wx:if="{{!hasUserInfo && canIUse }}">
-      <view  class='start' style='text-align:center;margin-top:50rpx;margin-bottom:50rpx;'>
+    <!--view hidden="{{hasUserInfo | !canIUse}}"-->
+    <view wx:if="{{!hasUserInfo & canIUse}}">
+      <view  class='start'>
       金猴微商城，助力抗击疫情。点击确认开启营销之旅~
       </view>
       
-      <view class="weui-btn">   <!--view class="zan-btns" start-->
-        <button open-type='getUserInfo' bindgetuserinfo="getUserInfo" class="weui-btn zan-btn--primary">确认</button>  
-      </view>     <!--view class="zan-btns"  end-->
-    </view>       <!--view wx:if="{{canIUse}}" end-->
+      <view class="weui-btn">   <!--view class="weui-btn" start-->
+        <button open-type='getUserInfo' bindgetuserinfo="getUserInfo" class="weui-btn">确认</button>  
+      </view>     <!--view class="weui-btn"  end-->    
+    </view>       <!--view wx:if  end-->
 
-      <!--view wx:else class='zan-font-16 zan-c-red' style='text-align:center;margin-top:50rpx'>
-        微信版本太低，不能继续...
-      </view-->
+
+    <view wx:elif="{{!canIUse}}">  <!--即login.js页面中的button.open-data.wx.getUserInfo功能不能用-->
+      <view  class='start'>
+      微信版本太低，请升级~
+      </view>
+    </view>       <!--view wx:elif  end-->
+
+
+      

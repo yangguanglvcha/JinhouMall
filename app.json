@@ -1,49 +1,66 @@
 {
-  "pages": [
-    "pages/index/index",
-    "pages/exam/exam",
-    "pages/score/score",
-    "pages/login/login",
-    "pages/scorelist/scorelist",
-    "pages/bestscore/bestscore"
+  "pages": [    
+    "page/component/login/login",
+    "page/component/index",    
+    "page/component/category/category",
+    "page/component/cart/cart",
+    "page/component/user/user",
+    "page/component/address/address",
+    "page/component/orders/orders",
+    "page/component/details/details",
+    "page/component/list/list"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "消防知识答题",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "金猴微商城",
+    "navigationBarBackgroundColor": "#AB956D",
+    "backgroundColor": "#eeeeee",
+    "enablePullDownRefresh": true
   },
   "tabBar": {
+    "color": "#b7b7b7",
+    "selectedColor": "#AB956D",
+    "borderStyle": "white",
+    "backgroundColor": "#f5f5f5",
     "list": [
       {
-        "pagePath": "pages/index/index",
-        "text": "首页",
-        "iconPath": "images/shouye.png",
-        "selectedIconPath": "images/shouyefill.png"
+        "pagePath": "page/component/index",
+        "iconPath": "image/12.png",
+        "selectedIconPath": "image/11.png",
+        "text": "主页"
       },
       {
-        "pagePath": "pages/login/login",
-        "text": "用户注册",
-        "iconPath": "images/yonghu.png",
-        "selectedIconPath": "images/yonghufill.png"
+        "pagePath": "page/component/category/category",
+        "iconPath": "image/22.png",
+        "selectedIconPath": "image/21.png",
+        "text": "分类"
       },
       {
-        "pagePath": "pages/exam/exam",
-        "text": "开始答题",
-        "iconPath": "images/radio.png",
-        "selectedIconPath": "images/radiofill.png"
+        "pagePath": "page/component/cart/cart",
+        "iconPath": "image/32.png",
+        "selectedIconPath": "image/31.png",
+        "text": "购物车"
       },
       {
-        "pagePath": "pages/score/score",
-        "text": "答题成绩",
-        "iconPath": "images/shizhong.png",
-        "selectedIconPath": "images/shizhongfill.png"
+        "pagePath": "page/component/user/user",
+        "iconPath": "image/42.png",
+        "selectedIconPath": "image/41.png",
+        "text": "我的"
       }
-    ],
-    "color": "#333",
-    "selectedColor": "#f7982a",
-    "backgroundColor": "#f6f6f6",
-    "borderStyle": "white"
+    ]
   },
-  "sitemapLocation": "sitemap.json"
+  "networkTimeout": {
+    "request": 10000,
+    "connectSocket": 10000,
+    "uploadFile": 10000,
+    "downloadFile": 10000
+  },
+  "debug": false,
+  "sitemapLocation": "sitemap.json",
+  "plugins": {
+    "myPlugin": {
+      "version": "1.0.8",
+      "provider": "wx000afcfee2b0af8f"
+    }
+  }
 }
