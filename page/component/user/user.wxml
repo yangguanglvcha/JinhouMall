@@ -27,20 +27,15 @@
             <!--view class="orders-number">订单编号：{{item.orderno}}</view-->
             <!--class="orders-detail"开始-->
             <view class="orders-detail">
-                <image src="https://jhsc.jinhou.online:886/{{item.image}}"></image>
+                <image src="{{imageUrl}}/{{item.image}}"></image>
                 <view class="">货号:{{item.itemno}}</view>
                 <view class=""><text space='ensp'>数量:{{item.itemcount}}  单价:{{item.itemprice}}</text></view>
                 <!--view class="">单价:{{item.itemcount}}</view-->
                 <text class="orders-status">{{item.orderstate}}</text>
             </view>   <!--class="orders-detail"结束-->
-        </view>   <!--class="orders-list"结束-->  
-            
-                    <!--view class="orders-footer">
-                <text>应付：￥{{item.ordermoney}}</text>
-                <button size="mini" class="orders-btn" bindtap="comfirmOrder">正式提交订单</button>
-            </view-->
-
+        </view>   <!--class="orders-list"结束-->
     </view>   <!--class="orders"结束-->    
-    <view class="orders-footer"><text>￥{{ordermoney}}</text></view>  
-</view>
-<!--class="orders-box"结束-->
+
+    <view wx:if='{{ordermoney}}' class="orders-footer"><text>订单金额合计￥{{ordermoney}}</text>
+    </view>  
+</view>   <!--class="orders-box"结束-->

@@ -1,38 +1,27 @@
 // page/component/details/details.js
 var app = getApp();
+var WxParse = require('../../../wxParse/wxParse.js');
 Page({
   data:{
-    goods: {
-      // id: 1,
-      // image: '',
-      // itemno:'',  //增加，记录商品货号，唯一确定商品
-      // title: '',
-      // price: 0.01,
-      // stock: '有货',
-      // detail: '',
-      // parameter: '',
-      // service: '不支持退货'
-    },
-    //carts: [],    //原来没有，添加以将购物车中的信息写入缓存
+    goods: {},    
     num: 1,
     totalNum: 0,
     hasCarts: false,  //购物车中是否有物品，false代表没有物品
     curIndex: 0,
     show: false,
-    scaleCart: false  //
+    scaleCart: false,  //
+    imageUrl:''
   },
-  onLoad:function(options){
-    /*原来在onLoad中显示图片，但出现VM23244:5 Failed to load image https://jhsc.jinhou.online:886/
-应该是变量还没有初始化，改为onShow
-    */
-    console.log('index页面传参', options)
+  onLoad:function(options){  
+    this.setData({ imageUrl:app.globalData.imageUrl})  
+    //console.log('index页面传参', options)
     if (options.mark == 'true') {
       var that = this;
       var url = app.globalData.myUrl + '?proc=getdetail&itemno=' + options.itemno;
       wx.request({
         url: url,
         success: function (res) {
-          console.log('swiper传参后查询', res)
+          //console.log('swiper传参后查询', res)
           var obj = new Object();
           //obj.image = '/'+res.data.rows[0].thumb;
           obj.image = res.data.rows[0].thumb;
@@ -46,8 +35,7 @@ Page({
         }
       })
     } else {
-      var obj = new Object();
-      //obj.image = '/' + options.thumb;
+      var obj = new Object();      
       obj.image = options.thumb;
       obj.itemno = options.itemno;
       obj.title = options.itemname;
@@ -56,7 +44,7 @@ Page({
       obj.service = '';
       obj.stock = (options.stock > 0) ? '有货' : '暂时无货';
       this.setData({ goods: obj })
-      console.log('detail图片', this.data.goods)
+      //console.log('detail图片', this.data.goods)
     }
       
   },
@@ -103,23 +91,8 @@ Page({
         }) 
         self.writeToCart();       
       }, 200)
-    }, 300);
-    
+    }, 300);    
     //console.log('总数',this.data.totalNum) //获取不到totalNum
-
-
-
-/*
-    wx.getStorage({
-      key: 'address',
-      success: function (res) {
-        self.setData({
-          address: res.data
-        })
-      }
-    })*/
-
-
   },
   writeToCart(){
     //准备写入的信息
@@ -127,26 +100,16 @@ Page({
     obj.num = this.data.totalNum; //总数添加到obj的num中
     obj.selected = true;
 
-    // var carts = [];
-    // carts.push(obj);
-    //  console.log('carts数据', carts)
-    // console.log('carts数据', carts[0].title)
-    /*添加购物车信息，写入数据库或缓存中    
-    不能保存到缓存，因为缓存的key不能重复，会覆盖
-    */
-    // console.log('app中的user', app.globalData)
-    // console.log('app中的user',app.globalData.userInfo.nickName)
-  
-    //var url = app.globalData.myUrl+'?proc=cart&itemno=' + this.data.goods.itemno + '&title=' + this.data.goods.title + '&total=' + this.data.totalNum + '&price=' + this.data.goods.price + '&nickname=' + app.globalData.userInfo.nickName+'&image='+this.data.goods.image
+    
     var path = this.data.goods.image;
     var pathstr = path.split("/");
     var str = '';
     for(var i=0;i<pathstr.length;i++){
       str = str + pathstr[i] + "|"
     }
-    //console.log(str)
+    
     var url = app.globalData.myUrl + '?proc=cart&itemno=' + this.data.goods.itemno + '&title=' + this.data.goods.title + '&price=' + this.data.goods.price + '&total=' + this.data.totalNum + '&nickname=' + app.globalData.userInfo.nickName + '&image=' + str
-    console.log(url)
+    //console.log(url)
     wx.request({
       url: url,
       success:function(res){

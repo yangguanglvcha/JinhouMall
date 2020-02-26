@@ -74,7 +74,7 @@
     width: 100%;
     height: 90rpx;
     line-height: 90rpx;
-    padding:0 100rpx 0 80rpx;
+    padding:0 0 0 80rpx;
     box-sizing: border-box;
     background: #AB956D;
     color: #fff;
@@ -95,9 +95,21 @@
 /*    background-image: url(/image/icon3.png);*/
     background-size: 100%;
 }
+/*cart-total-selectall为'全选'的文字式样*/
+.cart-total-selectall{
+  float:left;
+  width:100rpx;
+}
+/*cart-total-price为购物车选中物品的金额*/
 .cart-toatl-price{
-    float: right;
-    width: 120rpx;
+    float: left;
+    width: 200rpx;
+}
+/*cart-total-submit为'提交生成订单'的文字式样*/
+.cart-total-submit{  
+  float:right;
+  width:200rpx;
+  background-color: darkgreen;  
 }
 
 .cart-no-data{

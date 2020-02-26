@@ -11,8 +11,10 @@ App({
   globalData: {
     hasLogin: false,
     userInfo:null,
-    //myUrl : "http://192.168.82.138:801/ctl_jhsc.fsp"
+    //imageUrl: "https://jhsc.jinhou.online:886",
+    myUrl : "http://192.168.82.138:801/ctl_jhsc.fsp",
     //myUrl : "http://192.168.0.131:801/ctl_jhsc.fsp"
-    myUrl: "https://jhsc.jinhou.online:886/ctl_jhsc.fsp"
+    //myUrl: "https://jhsc.jinhou.online:886/ctl_jhsc.fsp",
+    imageUrl: "",
   }
 })

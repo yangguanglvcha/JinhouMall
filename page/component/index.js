@@ -29,14 +29,16 @@ Page({
     autoplay: false,
     interval: 3000,
     duration: 800,
+    imageUrl:''
   }, 
   onSelect: function (res) {
-    console.log('swiper参数', res)
+    //console.log('swiper参数', res)
     wx.navigateTo({
       url: '/page/component/details/details?itemno='+res.currentTarget.dataset.itemno+'&mark='+res.currentTarget.dataset.mark
     })
   },
   onLoad: function () {
+    this.setData({imageUrl:app.globalData.imageUrl})
     var that = this;
     var url = app.globalData.myUrl + '?proc=getlist';
     wx.request({

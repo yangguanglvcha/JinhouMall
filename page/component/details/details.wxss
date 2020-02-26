@@ -1,4 +1,6 @@
+@import "../../../wxParse/wxParse.wxss";
 @import '../../common/common.wxss';
+
 
 .goods-box{
     position: relative;

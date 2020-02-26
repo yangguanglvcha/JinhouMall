@@ -47,7 +47,8 @@
         <view class="newest-box">
             <view class="newest-list" wx:for='{{goods}}' wx:key='idgood'>
                 <navigator url="details/details?itemno={{item.itemno}}&price={{item.price}}&itemname={{item.itemname}}&stock={{item.stock}}&thumb={{item.thumb}}&detail=''">
-                    <image src="https://jhsc.jinhou.online:886/{{item.picpath}}"></image>
+                    <!--image src="https://jhsc.jinhou.online:886/{{item.picpath}}"></image-->
+                    <image src="{{imageUrl}}/{{item.picpath}}"></image>
                     <!-- 可以从数据库中获取产品名称和价格，但这里取的是包含名称和价格的图片，所以暂时把名称和价格部分去掉
                     <view class="newest-text"><text>{{item.itemname}}</text></view>
                     <view class="newest-text"><text>￥{{item.price}}</text></view>

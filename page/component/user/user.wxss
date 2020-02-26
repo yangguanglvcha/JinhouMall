@@ -103,18 +103,11 @@
     line-height: 120rpx;
     color: #b42f2d;
 }
-.orders-footer{
+
+.cart-footer{
+    float:right;
     height: 60rpx;
     line-height: 60rpx;
-    color: #2f2f2f;
-    padding:15rpx 30rpx 15rpx 0;
+    color: #2f2f2f; 
 }
-.orders-footer .orders-btn{
-    float: right;
-    width: 170rpx;
-    height: 60rpx;
-    line-height:60rpx;
-    border-radius: 6rpx;
-    background: #b42f2d;
-    color: #fff;
-}
+

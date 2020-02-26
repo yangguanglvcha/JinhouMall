@@ -7,9 +7,11 @@ Page({
     orders:[],
     hasAddress:false,
     address:{},
-    ordermoney:0  //原来没有，订单总金额
+    ordermoney:0,  //原来没有，订单总金额
+    imageUrl:''
   },
   onLoad(){
+    this.setData({imageUrl:app.globalData.imageUrl})
     var self = this;
     /**
      * 获取用户信息
@@ -48,12 +50,12 @@ Page({
     var self = this;
     //var url = app.globalData.myUrl + '?proc=getorders&nickname='+this.data.nickname;
     var url = app.globalData.myUrl + '?proc=getorders&nickname=' + app.globalData.userInfo.nickName;
-    console.log('我的url',url)
+    //console.log('我的url',url)
     wx.request({
       url:url,
       //url: 'http://www.gdfengshuo.com/api/wx/orders.txt',
       success(res){
-        console.log('获取的订单',res)
+        //console.log('获取的订单',res)
         if(res.data.errno==1){
           return;
         }else{

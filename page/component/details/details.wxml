@@ -1,7 +1,8 @@
 <view class="main">
     <view class="goods-box">
         
-        <image wx:if='{{goods.image}}' src="https://jhsc.jinhou.online:886/{{goods.image}}"  class="goods-thumb"></image>
+        <image wx:if='{{goods.image}}' src="{{imageUrl}}/{{goods.image}}"  class="goods-thumb"></image>
+        <!--image wx:if='{{goods.image}}' src="/{{goods.image}}"  class="goods-thumb"></image-->
         
         <navigator open-type="switchTab" url="../cart/cart">
             <view class="carts-icon {{scaleCart?'on':''}}">

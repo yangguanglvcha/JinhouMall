@@ -6,10 +6,9 @@ Page({
     hasList:false,          // 列表是否有数据
     totalPrice:0,           // 总价，初始为0
     selectAllStatus:true    // 全选状态，默认全选
-  },
-  //提交订单到数据库
+  },  
   /**
-   * 需保存用户信息，收货人，地址，电话
+   * 提交订单到数据库。需保存用户信息，收货人，地址，电话
    */
   submitorder(){
     if (this.data.totalPrice == 0) {
@@ -19,16 +18,15 @@ Page({
         showCancel: false
       })
       return
-    }
-    //console.log('toto',this.data.totalPrice)
-    //提交订单前，要保证收货人，地址、电话不能为空
+    }    
+    
     /**
      * 获取本地缓存 地址信息
      */    
     var addvalue = wx.getStorageSync('address')   
-    console.log('address',addvalue)   
+    //console.log('address',addvalue)   
     if (!addvalue){
-      console.log('cart-submitorder缓存中没有address信息')
+      //console.log('cart-submitorder缓存中没有address信息')
       wx.showModal({
         title: '提示',
         content: '地址信息不全，请填写完整信息',
@@ -42,19 +40,18 @@ Page({
       return  
     }
 
-    console.log('此时订单',this.data.carts)
-    console.log('此时totalPrice', this.data.totalPrice)
-    console.log('此时订单sele', this.data.carts[0].selected)
-    console.log('此时订单msg', this.data.carts.length)
+    // console.log('此时订单',this.data.carts)
+    // console.log('此时totalPrice', this.data.totalPrice)
+    // console.log('此时订单sele', this.data.carts[0].selected)
+    // console.log('此时订单msg', this.data.carts.length)
     //遍历数组，选中的才提交
     var obj = [];
     
-    //return
-    
+        
     this.data.carts.forEach(function(value,index){
       if (value.selected){
-        console.log(value)
-        console.log(value.itemno)
+        //console.log(value)
+        //console.log(value.itemno)
         var msg = new Object();
         // msg.id = index;
         // msg.value = value;        
@@ -69,29 +66,14 @@ Page({
         obj.push(msg)        
       }
     })
-    //console.log('obj值',obj)
-    //console.log('obj值2', obj[0])
-    //var cs = JSON.stringify(obj);
     
-    //return
     //保存到数据库
     var url = app.globalData.myUrl + '?proc=submitorder';
     wx.request({
-      url: url,
-      //dataType:'json',
-      // header: {
-      //   'content-type': 'application/x-www-form-urlencoded',
-      // },
+      url: url,      
       data: JSON.stringify(obj),
       method:'POST',
-      success:function(res){
-        // wx.showToast({
-        //   title: '订单添加成功',
-        // })
-        // wx.switchTab({
-        //   //url: '/page/component/user',
-        //   url: '../user/user',
-        // })
+      success:function(res){        
         wx.showModal({
           title: '提示',
           content: '订单已提交，工作人员会尽快联系您',
@@ -104,25 +86,19 @@ Page({
         })
       }
     })
-    //提交订单后，需要清空购物车
-    // var carts = [];
-    // this.setData({carts:carts,hasList:false})
-    //清空购物车的同时，将数据库g购物车清空
-
-  },
-  onLoad(){    
-  },
+    //提交订单后，后台需要清空购物车
+  },  
   onShow() {
-    console.log('状态：cart.js中的onshow执行')
+    //console.log('状态：cart.js中的onshow执行')
     //原来获取购物车信息写在noShow中，但有时不能执行，改到onLoad中
     //请求后台，获取购物车信息
     var url = app.globalData.myUrl + '?proc=getcarts&nickname=' + app.globalData.userInfo.nickName;
-    console.log('cart.js中url',url)
+    //console.log('cart.js中url',url)
     var that = this;
     wx.request({
       url: url,
       success: function (res) {
-        console.log('获取的购物车数据', res)
+        //console.log('获取的购物车数据', res)
         if(res.data.errno==1){
           //如果购物车为空
           that.setData({hasList:false})
@@ -140,6 +116,7 @@ Page({
    * 当前商品选中事件
    */
   selectList(e) {
+    //console.log('selectList',e)
     const index = e.currentTarget.dataset.index;
     let carts = this.data.carts;
     const selected = carts[index].selected;
@@ -206,6 +183,7 @@ Page({
    * 绑定减数量事件
    */
   minusCount(e) {
+    //console.log('minusCount',e)
     const index = e.currentTarget.dataset.index;
     let carts = this.data.carts;
     let num = carts[index].num;
