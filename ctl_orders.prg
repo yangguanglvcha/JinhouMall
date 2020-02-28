@@ -38,7 +38,7 @@ Define Class ctl_orders As ctl_public_sync_right Of ctl_public_sync_right.prg
     
     PROCEDURE getdetail
         Private ctj      
-        cquery = HttpQueryParams("query")
+        cquery = HttpQueryParams("orderno")
         ?'cquery',cquery
         ctj = ""
         
@@ -52,16 +52,19 @@ Define Class ctl_orders As ctl_public_sync_right Of ctl_public_sync_right.prg
 *!*	            nPage = 1
 *!*	        Endif
       
-     
+     TEXT TO ctj NOSHOW TEXTMERGE PRETEXT 1+2
+	              SELECT * FROM orderdetail WHERE orderno = '<<cquery>>'
+            ENDTEXT
 
         oDbHelper = Newobject("MsSqlHelper","MsSqlHelper.prg")
+        oDbHelper.SqlQuery(ctj,"ordertail")
         *nRow = oDbHelper.SqlSelectPage("cjxx",ctj,nPage,nLimit,"cjxx")
 
         *2019.9.9改用dal_ca，所以用以下语句（9.9前用上面语句）
         *nRow = oDbHelper.SqlSelectPage("View_hhxx",ctj,nPage,nLimit,"View_hhxx")
 
         *以下语句根本不需要，只是因为原来把area写为了aera,所以找不到area，导致分页不成功
-        oDbHelper.sqlquery("SELECT * FROM orderdetail","ordertail")
+        *oDbHelper.sqlquery("SELECT * FROM orderdetail","ordertail")
 
         Return cursorToJson("ordertail")
     

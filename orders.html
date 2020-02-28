@@ -62,10 +62,9 @@
 				var toolbar = new Ext.toolbar.Toolbar({
 					items:[
 						 '请输入用户编号',
-						 {xtype:'textfield',id:'usernoinput',name:'userno'},						
+						 {xtype:'textfield',id:'usernoinput',name:'userno',width:60},						
 						 '请输入用户密码',
-						 {xtype:'textfield',id:'userpwdinput',name:'userpwd'},							 
-						 // {xtype:'labelfield',fieldLabel:'所在部门',id:'departname'},					 
+						 {xtype:'textfield',id:'userpwdinput',name:'userpwd',width:80},							 						 					 
 				         {text:'验证用户',handler:function(){
 				           var cValue = Ext.getCmp('usernoinput').getValue(); 
 						   var cPwd = Ext.getCmp('userpwdinput').getValue(); 	
@@ -98,36 +97,72 @@
 						        }
 						    })						   
 				        }},						
-						 '订货部门',
+						 '所在部门',
 						 {xtype:'textfield',
 						  id:'departname',
 						  readOnly:true,
 						  name:'departname',
-						  width:60
+						  width:80
 						 },
 						 '订货人姓名',
 						{xtype:'textfield',
 						readOnly:true,
 						id:'sellername',
 						name:'sellername',
-						width:50
+						width:60
 						},
 						'电话',
 						{xtype:'textfield',id:'usertel',name:'sellertel',readOnly:true,width:80},
 						{xtype:'textfield',id:'departno',name:'departno',hidden:true},	
-						{xtype:'textfield',id:'orderno',name:'orderno',hidden:true},
-						//{xtype:'textfield',id:'orderdate',name:'orderdate',hidden:true},				 
+						//{xtype:'textfield',id:'orderno',name:'orderno',hidden:true},
+						{xtype:'textfield',id:'ordermoney',name:'ordermoney',hidden:true},				 
 						{text:'增加订单',handler:add},
 						{text:'订单提交',handler:save}
 					]
 				});
+				
+
+				
+				var form = new Ext.form.Panel({		
+					tbar:[toolbar],
+					fieldDefaults: {
+						labelWidth: 70,
+						labelAlign: "left",
+						//flex: 1,	//
+						margin: 5
+					},
+					/*举例：
+					flex:1
+					flex:1
+			   表示这2个元素各占用总宽度的1/2			   
+				   flex:1
+				   flex:2
+				   flex:2
+			   表示这3个元素占的宽度分别为1/(1+2+2),2/(1+2+2),2/(1+2+2)
+					*/
+					items:[							
+						{//xtype:'container',
+						xtype:'fieldset',
+						style:'margin-left:10rpx',
+						title:'主表配送信息',
+						layout:'hbox',
+						items:[							
+							{xtype:'datefield',fieldLabel:'订单日期',format:'Y-m-d',id:'datesel',name:'orderdate',width:160},
+							{xtype:'textfield',fieldLabel:'收货人姓名',name:'receiver',id:'receiver',width:140},
+							{xtype:'textfield',fieldLabel:'收货人地址',name:'recaddress',id:'recaddress',width:400},
+							{xtype:'textfield',fieldLabel:'收货人电话',name:'receivertel',id:'receivertel',width:160},
+							{xtype:'textfield',fieldLabel:'订单号',name:'orderno',id:'orderno',readOnly:'true',width:190}
+						]}						
+					]
+				})	
+				var orderno = Ext.getCmp('orderno').getValue();
 				
 				var store = new Ext.data.Store({
 					model:'detailmodel',
 					autoLoad:true,
 					proxy:{
 						type:'ajax',
-						url:'ctl_orders.fsp?proc=getdetail',
+						url:'ctl_orders.fsp?proc=getdetail&orderno='+orderno,
 						reader:{
 							type:'json',
 							root:'rows'
@@ -151,38 +186,70 @@
 							clicksToEdit:1
 						})
 					]
-				})	
+				})					
 				
-				var form = new Ext.form.Panel({		
-					tbar:[toolbar],
-					items:[	
-						
-						{xtype:'container',
-						layout:'hbox',
-						items:[
-							{xtype:'datefield',fielLabel:'订单日期',format:'Y-m-d',width:90,id:'datesel',name:'orderdate'},
-							{xtype:'textfield',fieldLabel:'收货人姓名',name:'receiver'},
-							{xtype:'textfield',fieldLabel:'收货人地址',name:'recaddress'},
-							{xtype:'textfield',fieldLabel:'收货人电话',name:'receivertel'}						
-						]}						
-					]
-				})	
 				var panel = new Ext.panel.Panel({
 					items:[
 						form,
-						
-						grid]
+						{
+							xtype:'fieldset',
+							style:'margin-left:10rpx',
+							title:'明细表格',
+							items:[
+								{xtype:'button',text:'增加货号',handler:addItem,id:'additem',disabled:'true'},
+								{xtype:'button',text:'修改货号'},
+								{xtype:'button',text:'删除货号'},
+								grid],
+						}											
+					]
 				})
 				var viewport = new Ext.container.Viewport({
 					items:[panel]
 				})
+				
+				//添加货号
+				function addItem(){
+					//将收货人/地址/电话设为只读
+					Ext.getCmp("receiver").setReadOnly(true);
+					Ext.getCmp("receivertel").setReadOnly(true);
+					Ext.getCmp("recaddress").setReadOnly(true);
+					var record = Ext.create('detailmodel',{
+						orderno:Ext.getCmp('orderno').getValue(),
+						itemno:'',
+						color:'',
+						size:'',
+						num:'',
+						price:''
+					});
+					store.insert(store.getCount(),record);
+					// console.log('addItem中record:',record)
+					// var rec = JSON.stringify(record)
+					// console.log('num',record.data.num)
+					// var money = record.data.num*record.data.price
+					// Ext.getCmp('ordermoney').setValue(ordermoney+money)					
+				}
 				
 				//新增订单
 				function add(){
 					/*先要形成订单号,订单号的生成规则为departno+20200123+三位随机数+id,长度20位
 					*先到orders表中查最后1条记录，获取其id，加1
 					*如果orders表中是空的，
-					*/		
+					*/	
+				    //新增订单前,必须先验证用户,如果用户名,所在部门和电话有一个是空的,不继续进行
+					// Ext.getCmp('departname').setValue(departname)
+					// Ext.getCmp('sellername').setValue(username)
+					// Ext.getCmp('usertel').setValue(usertel)
+					//console.log(Ext.getCmp('departname').getValue()==false)
+					if((!Ext.getCmp('departname').getValue())|(!Ext.getCmp('sellername').getValue())|(!Ext.getCmp('usertel').getValue())){
+						Ext.Msg.alert("提示","用户信息没有验证");	
+						return
+					}
+				    Ext.getCmp('additem').enable();		//将添加货号按钮设为可用	
+					//将收货人/地址/电话设为可用
+					Ext.getCmp("receiver").setReadOnly(false);
+					Ext.getCmp("receivertel").setReadOnly(false);
+					Ext.getCmp("recaddress").setReadOnly(false);					
+				    var ordermoney = 0;
 				    var date = new Date();
 					var rq = date.toJSON().substr(0, 11).replace(/[-T]/g, '');        
 						
@@ -191,7 +258,7 @@
 
 
 					var result = '';
-					for(var i=0;i<4;i++){
+					for(var i=0;i<3;i++){
 					  var ranNum = Math.ceil(Math.random() * 25); //生成一个0到25的数字
 					  //大写字母'A'的ASCII是65,A~Z的ASCII码就是65 + 0~25;然后调用String.fromCharCode()传入ASCII值返回相应的字符并push进数组里
 					  result=result+String.fromCharCode(65+ranNum);
@@ -199,19 +266,12 @@
 			
 				    var orderno = result + rq + '-'+sj
 					Ext.getCmp('orderno').setValue(orderno);
-					var record = Ext.create('detailmodel',{
-						orderno:orderno,
-						itemno:'',
-						color:'',
-						size:'',
-						num:'',
-						price:''
-					});
-					store.insert(0,record);
+					
 				}
 				
 				//保存订单数据
 				function save(){
+					Ext.getCmp('additem').disable();
 					//必须先获取主表数据oValues
 					var oValues = form.getForm().getValues();
 					console.log(oValues);
