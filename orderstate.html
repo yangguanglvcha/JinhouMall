@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="extjs4.2.1/resources/css/ext-all.css">
+		<link rel="stylesheet" type="text/css" href="css/schedule.css">	
+		<script src="extjs4.2.1/ext-all.js"></script>
+		<script src="extjs4.2.1/locale/ext-lang-zh_CN.js"></script>
+	</head>
+	<body>
+		<script>
+			Ext.onReady(function(){
+				Ext.regModel('ordermodel',{
+					//idProperty:'ryxx_id',
+					fields:['id','orderno','orderdate','departno','departname','sellername','sellertel','orderstate','ordertype','orderdesc','receiver','recaddress','receivertel','ordermoney']
+				});
+				Ext.regModel('detailmodel',{
+					fields:['id','orderno','itemno','color','size','num','price','othermsg']
+				});	
+				
+				
+				var orderStore = new Ext.data.Store({
+					model:'ordermodel',
+					autoLoad:'true',
+					proxy:{
+						type:'ajax',
+						url:'ctl_orderstate.fsp?proc=getorder',
+						reader:{
+							type:'json',
+							root:'rows'
+						}
+					}
+				});
+				
+				var orderno = ''
+				var detailStore = new Ext.data.Store({
+					model:'detailmodel',
+					autoLoad:'true',
+					proxy:{
+						type:'ajax',
+						url:'ctl_orderstate.fsp?proc=getdetail&orderno='+orderno,
+						reader:{
+							type:'json',
+							root:'rows'
+						}
+					}
+				});
+				var detailgrid = new Ext.grid.Panel({
+					store:detailStore,					
+					height:200,
+					columns:[
+						{header:'货号',dataIndex:'itemno'},
+						{header:'颜色',dataIndex:'color'},
+						{header:'尺码',dataIndex:'size'},
+						{header:'数量',dataIndex:'num'},
+						{header:'单价',dataIndex:'price'},
+					]
+				});
+				
+				var ordergrid = new Ext.grid.Panel({					
+					store:orderStore,
+					//tbar:[toolbar],					
+					//height:360,
+					columns:[
+						{header:'订单号',dataIndex:'orderno'},
+						{header:'订单日期',dataIndex:'orderdate'},
+						{header:'部门',dataIndex:'departname'},
+						{header:'员工',dataIndex:'sellername'},
+						{header:'电话',dataIndex:'sellertel'},							
+						{header:'金额',dataIndex:'ordermoney'},
+						{header:'收货人',dataIndex:'receiver'},
+						{header:'收货地址',dataIndex:'recaddress'},
+						{header:'收货人电话',dataIndex:'receivertel'},
+						{header:'订单状态',dataIndex:'orderstate'},
+					],					
+					listener:{
+						cellclick:function(table,td,cellIndex,record){							
+							var name = table.getHeaderAtIndex(cellIndex).dataIndex;  //获得字段名
+							var data = record.get(name);
+							var rec = ordergrid.getStore().getAt(cellIndex);
+							console.log('record',record);  //可以获取到该条记录数据
+							console.log('rec',rec);
+							console.log('name',name);
+							console.log('data',data);
+							console.log('orderno',record.data.orderno);
+						}	
+					}
+				})
+				var toolbar = new Ext.toolbar.Toolbar({
+					items:[
+						 '请输入用户编号',
+						{xtype:'textfield',id:'usernoinput',name:'userno',width:60},						
+						'请输入用户密码',
+						{xtype:'textfield',id:'userpwdinput',name:'userpwd',width:80},	
+						{text:'获取订单',iconCls:'add',handler:select},	
+						{text:'更改状态',iconCls:'reset',handler:change},	
+					]
+				})
+				// ordergrid.on('rowclick',function(grid,rowIndex,event){
+				// 	var record = grid.getStore().getAt(rowIndex);
+				// 	console.log('选择行获取:',record)
+				// });
+				function change(){
+					console.log('change执行')
+					var sel = ordergrid.getSelectionModel().getSelection();										
+					if (sel.length==0){
+						Ext.Msg.alert("提示","没有选择任何订单");
+						return;
+					}
+					var orderno = sel[0].data.orderno;
+					console.log('订单信息1',sel[0].data.orderno+sel[0].data.orderdate+sel[0].data.sellername)//可以获取到订单号		
+					var ordermsg = '要操作的订单信息如下:<br/>'
+					ordermsg = ordermsg + '订单日期:' + sel[0].data.orderdate+'</br>'
+					ordermsg = ordermsg + '销售员:' + sel[0].data.sellername+'\n'+'\n';
+					ordermsg = ordermsg + '部门:' + sel[0].data.departname+'</br>'
+					ordermsg = ordermsg + '金额:' + sel[0].data.ordermoney+'</br>'
+					Ext.Msg.show({
+		                title: '提示',
+		                msg: '是否确认更改订单状态?<br />'+ordermsg,
+		                buttons: Ext.Msg.OKCANCEL,//Ext.Msg.YESNO,
+		                //icon: Ext.Msg.QUESTION,
+		                fn: function (btn) {
+		                    if (btn === 'ok') {
+								console.log('用户确认')
+		                        //var key = grid.selModel.getLastSelected().get('name');
+		                        Ext.Ajax.request({
+		                            url: 'ctl_orderstate.fsp?proc=changestate&orderno='+orderno,
+		                            success: function (response, opts) {
+		                                Ext.MessageBox.alert('提示', '状态修改成功');
+		                                ordergrid.store.reload();
+		                            },
+		                            failure: function (response, opts) {
+		                                Ext.MessageBox.alert('提示', '状态设置异常');
+		                            }
+		                        });
+		                    }
+						}
+					})		
+	
+				}
+				function select(){
+					var sel = ordergrid.getSelectionModel().getSelection();
+					console.log('订单信息1',sel[0].data.orderno)//可以获取到订单号		
+					detailStore.getProxy().setExtraParam('orderno',sel[0].data.orderno);
+		            detailStore.reload(); 
+				}
+				var form = new Ext.form.Panel({
+					tbar:[toolbar]
+				})
+				var panel = new Ext.panel.Panel({
+					renderTo:Ext.getBody(),
+					items:[
+						form,
+						ordergrid,
+						detailgrid
+						]
+					//items:[ordergrid]
+				})
+				// var viewport = new Ext.container.Viewport({
+				// 	items:[panel]
+				// })
+				
+			})
+		</script>
+	</body>
+</html>

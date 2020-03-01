@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="extjs4.2.1/resources/css/ext-all.css">
+		<script src="extjs4.2.1/ext-all.js"></script>
+		<script src="extjs4.2.1/locale/ext-lang-zh_CN.js"></script>
+	</head>
+	<body>
+		<script>
+	var arrPro = [{ t: '北京', id: 1 }, { t: '上海', id: 2 }, { t: '广西', id: 3 }]
+    //市数据结构，为json数组对象。数组小标为省的id，数组项为市json数据。。
+    var arrCity = [];
+    arrCity[1] = [{ t: '北京市', id: 1 }];
+    arrCity[2] = [{ t: '上海市', id: 2 }];
+    arrCity[3] = [{ t: '南宁市', id: 3 }, { t: '桂林市', id: 4 }, { t: '柳州市', id: 5 }];
+    //如果还有县的联动，同理生成arrTown即可
+	//arrTown[1]对应id=1的下级,即北京的区和县.arrTown[2]对应id=2,即上海的区.arrTown[5]对应id=5,即柳州
+    var arrTown = [];
+    arrTown[1] = [{ t: '东城区', id: 1 }, { t: '海淀区', id: 2 }]
+    arrTown[2] = [{ t: '黄埔区', id: 4 }, { t: '静安区', id: 5 }]
+    arrTown[3] = [{ t: '青秀区', id: 6 }]
+    arrTown[4] = [{ t: '七星区', id: 7 }, { t: '象山区', id: 8 }, { t: '秀峰区', id: 9 }]
+    arrTown[5] = [{ t: '鱼峰区', id: 10 }, { t: '拉堡', id: 11 }]
+    
+		Ext.onReady(function(){	
+			Ext.regModel('model',{fields:[
+				'id','name','parentid','shortname','leveltype']
+			});
+			var mystore = new Ext.data.Store({
+				model:'model',
+				autoLoad:'true',
+				proxy:{
+					type:'ajax',
+					url:'ctl_region.fsp?proc=getpro',
+					reader:{
+						type:'json',
+						root:'rows'
+					}
+				}
+			})
+			var citystore = new Ext.data.Store({
+				model:'model',
+				//autoLoad:'true',
+				proxy:{
+					type:'ajax',
+					url:'ctl_region.fsp?proc=getcity',
+					reader:{
+						type:'json',
+						root:'rows'
+					}
+				}
+			});
+			var townstore = new Ext.data.Store({
+				model:'model',
+				//autoLoad:'true',
+				proxy:{
+					type:'ajax',
+					//原来写成了utl:'ctl_region.fsp?proc=gettown',
+					url:'ctl_region.fsp?proc=gettown',
+					reader:{
+						type:'json',
+						root:'rows'
+					}
+				}
+			});
+			
+			var form = new Ext.form.Panel({
+				renderTo:Ext.getBody(),
+				items:[
+					{
+						xtype:'combo',
+						emptyText:'省自治区',
+				        queryMode:'remote',
+				        displayField:'shortname',
+						valueField:'id',
+				        store:mystore,
+						id:'areacombo',
+						listeners:{
+							select:function(combo,record,index){	
+								Ext.getCmp('citycombo').clearValue();
+								citystore.load({									
+									url:'ctl_region.fsp?proc=getcity',
+									params:{areaquery:Ext.getCmp('areacombo').value}
+								})
+							}
+						}
+				    },	
+					{
+						xtype:'combo',
+						store:citystore,
+						queryMode:'remote',
+						displayField:'shortname',
+						valueField:'id',
+						id:'citycombo',
+						emptyText:'地市',
+						width:90,
+						listeners:{
+							 select:function(combo,record,index){	
+							 	Ext.getCmp('towncombo').clearValue();
+							 	townstore.load({									
+							 		url:'ctl_region.fsp?proc=gettown',
+							 		params:{query:Ext.getCmp('citycombo').value}
+							 	})
+							 },
+							expand:function(combo,opt){								
+								if (Ext.isEmpty(Ext.getCmp('areacombo').value)){
+									Ext.getCmp('citycombo').clearValue();	
+									Ext.Msg.alert('提示','请选择区域')			
+								}else{
+									var proxy = Ext.getCmp('citycombo').getStore().getProxy();
+									proxy.setExtraParam('areaquery',Ext.getCmp('areacombo').value)
+								}								
+							}
+						}
+					},
+					{
+						xtype:'combo',
+						store:townstore,
+						queryMode:'remote',
+						displayField:'shortname',
+						//valueField:'MergerName',
+						valueField:'id',
+						//width:90	
+						id:'towncombo',
+						emptyText:'区或县',
+						listeners:{
+							expand:function(combo,opt){
+								if(Ext.isEmpty(Ext.getCmp('citycombo').value)){
+									Ext.getCmp('towncombo').clearValue();
+									Ext.Msg.alert('提示','没有选择地市')
+								}else{
+									// var proxy = Ext.getCmp('towncombo').getStore().getProxy();
+									// proxy.setExtraParam('query',Ext.getCmp('citycombo').value)
+								}
+							}
+						}
+					},
+					{xtype:'button',text:'获取地址',handler:function(){
+						console.log('地址',Ext.getCmp('areacombo').value)
+						console.log('地址2',Ext.getCmp('citycombo').value)
+						console.log('地址3',Ext.getCmp('towncombo').getValue())
+						var senddata = {id:Ext.getCmp('towncombo').getValue()}
+						Ext.Ajax.request({
+							url:'ctl_region.fsp?proc=getaddress',
+							jsonData:senddata,
+							method:'POST',
+							callback:function(options,success,res){
+								var result = JSON.parse(res.responseText)
+								console.log('地址',res.responseText)
+								console.log('地址',result.rows[0].MergerName)
+							}
+						})
+						},
+					}
+					
+				]
+			})
+			
+			
+			/*
+			 Ext.define('Area', 
+				{ extend: 'Ext.data.Model', 
+				fields: [{ name: 't' }, { name: 'id' }] });
+				
+        Ext.create('Ext.panel.Panel', {
+            title: 'extjs combobox省市县3级联动示例',
+            width: 500,
+            frame: true,
+            layout: { type: 'table', columns: 6, tdAttrs: { valign: 'top' } },
+            defaults: { bodyStyle: 'padding:5px;background-color:transparent;border:none' },
+            items: [
+				{
+					html: '省：',
+				}, 
+			{
+                xtype: 'combobox', 
+				width: 100, 
+				queryMode: 'local', 
+				displayField: 't', 
+				valueField: 'id',
+				id:'cbPro',
+                store: Ext.create('Ext.data.Store', { model: 'Area' }),
+                value:3,//默认值，实际应用从数据库中读取
+                listeners: {
+                    //显示后加载数据并且触发chagne事件加载市
+                    afterrender: function (el, opts) {
+                        el.getStore().loadData(arrPro);
+                        var value = el.getValue();
+                        //重新设置过值，要不loadData后上面配置的value直接显示而不是显示对应的text
+                        el.setValue(value).fireEvent('change', el, value, 'init');
+                    },
+                    change: function (el, nv, ov, opts) {
+                        Ext.getCmp('cbCity').getStore().loadData(arrCity[nv]);
+                        if (ov !== 'init') Ext.getCmp('cbCity').setValue('...')
+                    }
+                }
+            }, 
+			{
+                html: '市'
+            }, 
+			{
+                xtype: 'combobox', 
+				width: 100, 
+				queryMode: 'local', 
+				displayField: 't', 
+				valueField: 'id',
+				id:'cbCity',
+                store: Ext.create('Ext.data.Store', { model: 'Area' }),
+                value: 4,//默认值，实际应用从数据库中读取
+                listeners: {
+                    //显示后加载数据并且触发chagne事件加载县
+                    afterrender: function (el, opts) {
+                        el.getStore().loadData(arrCity[Ext.getCmp('cbPro').getValue()]);
+                        var value = el.getValue();
+                        //重新设置过值，要不loadData后上面配置的value直接显示而不是显示对应的text
+                        el.setValue(value).fireEvent('change', el, value, 'init');
+                    },
+                    change: function (el, nv, ov, opts) {
+                        Ext.getCmp('cbTown').getStore().loadData(arrTown[nv]);
+                        if (ov !== 'init') Ext.getCmp('cbTown').setValue('...')
+                    }
+                }
+            }, {
+                html: '县'
+            }, {
+                xtype: 'combobox', width: 100, queryMode: 'local', displayField: 't', valueField: 'id', id: 'cbTown',
+                store: Ext.create('Ext.data.Store', { model: 'Area' }),
+                value: 7,//默认值，实际应用从数据库中读取
+                listeners: {
+                    afterrender: function (el, opts) {
+                        el.getStore().loadData(arrTown[Ext.getCmp('cbCity').getValue()]);
+                        var value = el.getValue();
+                        //重新设置过值，要不loadData后上面配置的value直接显示而不是显示对应的text
+                        el.setValue(value)
+                    }
+                }
+            }],
+            renderTo: Ext.getBody()
+        });  */
+		})
+		</script>
+	</body>
+</html>
