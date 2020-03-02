@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="extjs4.2.1/resources/css/ext-all.css">
+		<script src="extjs4.2.1/ext-all.js"></script>
+		<script src="extjs4.2.1/locale/ext-lang-zh_CN.js"></script>
+	</head>
+	<body>
+		<script>
+			Ext.onReady(function(){ 
+				Ext.regModel('model',{fields:[
+		'id','name','parentid','shortname','leveltype']
+				});
+				var mystore = new Ext.data.Store({
+					model:'model',
+					autoLoad:'true',
+					proxy:{
+						type:'ajax',
+						url:'ctl_region.fsp?proc=getpro',
+						reader:{
+							type:'json',
+							root:'rows'
+						}
+					}
+				})
+				var citystore = new Ext.data.Store({
+					model:'model',
+					//autoLoad:'true',
+					proxy:{
+						type:'ajax',
+						url:'ctl_region.fsp?proc=getcity',
+						reader:{
+							type:'json',
+							root:'rows'
+						}
+					}
+				});
+				var townstore = new Ext.data.Store({
+					model:'model',
+					//autoLoad:'true',
+					proxy:{
+						type:'ajax',
+						//原来写成了utl:'ctl_region.fsp?proc=gettown',
+						url:'ctl_region.fsp?proc=gettown',
+						reader:{
+							type:'json',
+							root:'rows'
+						}
+					}
+				});
+				
+				var form = new Ext.form.Panel({
+					renderTo:Ext.getBody(),
+					items:[
+						{
+							xtype:'container',
+							layout:'hbox',
+							//align:'left',
+							items:[
+								{
+									xtype:'combo',
+									emptyText:'省自治区',
+							        queryMode:'remote',
+							        displayField:'name',
+									valueField:'id',
+							        store:mystore,
+									id:'areacombo',									
+									//width:100,
+									listeners:{
+										select:function(combo,record,index){	
+											Ext.getCmp('citycombo').clearValue();
+											citystore.load({									
+												url:'ctl_region.fsp?proc=getcity',
+												params:{areaquery:Ext.getCmp('areacombo').value}
+											})
+										}
+									}
+								},	
+								{
+									xtype:'combo',
+									store:citystore,
+									queryMode:'remote',
+									displayField:'name',
+									valueField:'id',
+									id:'citycombo',
+									emptyText:'地市',
+									//width:90,
+									listeners:{
+										 select:function(combo,record,index){	
+											Ext.getCmp('towncombo').clearValue();
+											townstore.load({									
+												url:'ctl_region.fsp?proc=gettown',
+												params:{query:Ext.getCmp('citycombo').value}
+											})
+										 },
+										expand:function(combo,opt){								
+											if (Ext.isEmpty(Ext.getCmp('areacombo').value)){
+												Ext.getCmp('citycombo').clearValue();	
+												Ext.Msg.alert('提示','请选择区域')			
+											}else{
+												var proxy = Ext.getCmp('citycombo').getStore().getProxy();
+												proxy.setExtraParam('areaquery',Ext.getCmp('areacombo').value)
+											}								
+										}
+									}
+								},
+								{
+									xtype:'combo',
+									store:townstore,
+									queryMode:'remote',
+									displayField:'name',
+									//valueField:'MergerName',
+									valueField:'id',
+									//width:90,	
+									id:'towncombo',
+									emptyText:'区或县',
+									listeners:{
+										expand:function(combo,opt){
+											if(Ext.isEmpty(Ext.getCmp('citycombo').value)){
+												Ext.getCmp('towncombo').clearValue();
+												Ext.Msg.alert('提示','没有选择地市')
+											}else{
+												// var proxy = Ext.getCmp('towncombo').getStore().getProxy();
+												// proxy.setExtraParam('query',Ext.getCmp('citycombo').value)
+											}
+										}
+									}
+								},
+								{
+									xtype:'textfield',
+									//fieldLabel:'详细地址',
+									emptyText:'详细地址',
+									width:200
+								}
+							]							
+						},
+						
+						//以下为竖向
+						
+						{xtype:'button',text:'获取地址',handler:function(){
+							console.log('地址',Ext.getCmp('areacombo').value)
+							console.log('地址2',Ext.getCmp('citycombo').value)
+							console.log('地址3',Ext.getCmp('towncombo').getValue())
+							console.log('地址4',Ext.getCmp('areacombo').getRawValue())
+							console.log('地址5',Ext.getCmp('citycombo').getRawValue())
+							//地址6符合要求
+							console.log('地址6',Ext.getCmp('areacombo').getRawValue()+Ext.getCmp('citycombo').getRawValue()+Ext.getCmp('towncombo').getRawValue())
+							var senddata = {id:Ext.getCmp('towncombo').getValue()}
+							Ext.Ajax.request({
+								url:'ctl_region.fsp?proc=getaddress',
+								jsonData:senddata,
+								method:'POST',
+								callback:function(options,success,res){
+									var result = JSON.parse(res.responseText)
+									var mername = result.rows[0].mergername;
+									
+									console.log('地址',res.responseText)
+									console.log('地址',result.rows[0].mergername)
+								}
+							})
+							},
+						}
+						
+					]
+				})
+				
+			})
+		</script>
+	</body>
+</html>
